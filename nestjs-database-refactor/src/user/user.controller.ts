@@ -6,11 +6,15 @@ import {
   Post,
   Inject,
   LoggerService,
+  Body,
+  Param,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ConfigService } from '@nestjs/config';
 import { User } from './user.entity';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { getUserDto } from './dto/get-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -25,39 +29,43 @@ export class UserController {
     this.logger.log('UserController init');
   }
 
+  @Get('/profile')
+  getUserProfile(@Query('id') id: number): any {
+    return this.userService.findProfile(id);
+  }
+
+  @Get('/:id')
+  getUser(): any {
+    return 'hello';
+    // return this.userService.getUsers();
+  }
+
   @Get()
-  getUsers(): any {
-    this.logger.log(`请求getUsers成功`);
-    this.logger.warn(`请求getUsers成功`);
-    this.logger.error(`请求getUsers成功`);
-    return this.userService.findAll();
+  getUsers(@Query() query: getUserDto): any {
+    return this.userService.findAll(query);
     // return this.userService.getUsers();
   }
 
   @Post()
-  addUser(): any {
+  addUser(@Body() dto: any): any {
     // todo 解析Body参数
-    const user = { username: 'toimc', password: '123456' } as User;
+    const user = dto as User;
     // return this.userService.addUser();
     return this.userService.create(user);
   }
-  @Patch()
-  updateUser(): any {
+
+  @Patch('/:id')
+  updateUser(@Body() dto: any, @Param('id') id: number): any {
     // todo 传递参数id
     // todo 异常处理
-    const user = { username: 'newname' } as User;
-    return this.userService.update(1, user);
+    const user = dto as User;
+    return this.userService.update(id, user);
   }
 
-  @Delete()
-  deleteUser(): any {
+  @Delete('/:id')
+  deleteUser(@Param('id') id: number): any {
     // todo 传递参数id
-    return this.userService.remove(1);
-  }
-
-  @Get('/profile')
-  getUserProfile(): any {
-    return this.userService.findProfile(2);
+    return this.userService.remove(id);
   }
 
   @Get('/logs')

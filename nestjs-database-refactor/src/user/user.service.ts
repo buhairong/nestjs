@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { Logs } from '../logs/logs.entity';
+import { getUserDto } from './dto/get-user.dto';
+import { conditionUtils } from '../utils/db.helper';
 
 @Injectable()
 export class UserService {
@@ -11,12 +13,73 @@ export class UserService {
     @InjectRepository(Logs) private readonly logsRepository: Repository<Logs>,
   ) {}
 
-  findAll() {
-    return this.userRepository.find();
+  findAll(query: getUserDto) {
+    const { limit, page, username, gender, role } = query;
+    const take = limit || 10;
+    const skip = ((page || 1) - 1) * take;
+    // return this.userRepository.find({
+    //   select: {
+    //     id: true,
+    //     username: true,
+    //     profile: {
+    //       gender: true,
+    //     },
+    //   },
+    //   relations: {
+    //     profile: true,
+    //     roles: true,
+    //   },
+    //   where: {
+    //     username,
+    //     profile: {
+    //       gender,
+    //     },
+    //     roles: {
+    //       id: role,
+    //     },
+    //   },
+    //   take,
+    //   skip: (page - 1) * take,
+    // });
+
+    const obj = {
+      'user.username': username,
+      'profile.gender': gender,
+      'roles.id': role,
+    };
+
+    const queryBuilder = this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.profile', 'profile')
+      .leftJoinAndSelect('user.roles', 'roles');
+
+    const newQuery = conditionUtils<User>(queryBuilder, obj);
+
+    // if (username) {
+    //   queryBuilder.where('user.username = :username', { username });
+    // } else {
+    //   queryBuilder.where('user.username IS NOT NULL');
+    // }
+
+    // if (username) {
+    //   queryBuilder.where('user.username = :username', { username });
+    // } else {
+    //   queryBuilder.where('user.username IS NOT NULL');
+    // }
+
+    // if (gender) {
+    //   queryBuilder.andWhere('profile.gender = :gender', { gender });
+    // }
+
+    // if (role) {
+    //   queryBuilder.andWhere('roles.id = :role', { role });
+    // }
+
+    return newQuery.take(take).skip(skip).getMany();
   }
 
   find(username: string) {
-    return this.userRepository.findOne({ where: { username } });
+    return this.userRepository.find({ where: { username } });
   }
 
   findOne(id: number) {
@@ -25,7 +88,14 @@ export class UserService {
 
   async create(user: User) {
     const userTmp = await this.userRepository.create(user);
-    return this.userRepository.save(userTmp);
+    try {
+      const res = this.userRepository.save(userTmp);
+      return res;
+    } catch (error) {
+      if (error.errno && error.errno === 1062) {
+        throw new HttpException(error.sqlMessage, 500);
+      }
+    }
   }
 
   async update(id: number, user: Partial<User>) {

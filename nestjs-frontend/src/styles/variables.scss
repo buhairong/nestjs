@@ -1,6 +1,6 @@
 // Colors
 $primary: #42b983;
-$body-color: #304455;
+$body-color: #2B354A;
 $info: #73abfe;
 $gray-100: #f6f6f6;
 $text-muted: #4e6e8e;
@@ -11,3 +11,19 @@ $dark: #273849;
 // Require
 @import "./basic";
 $navbar-dark-color: rgba($white, .7);
+
+.bg {
+  background-color: $body-color;
+}
+
+.nav-bg {
+  background-color: #364257;
+}
+
+.avatar-circle {
+  border-radius: 50%;
+}
+
+.cursor{
+  cursor: pointer;
+}

@@ -1,6 +1,6 @@
 <template>
   <div>
-    注册
+    菜单页面
   </div>
 </template>
 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    注册
+    dashboard内容
   </div>
 </template>
 

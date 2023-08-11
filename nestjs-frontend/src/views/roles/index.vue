@@ -1,6 +1,6 @@
 <template>
   <div>
-    注册
+    角色页面
   </div>
 </template>
 
