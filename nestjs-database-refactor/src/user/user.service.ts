@@ -99,11 +99,16 @@ export class UserService {
   }
 
   async update(id: number, user: Partial<User>) {
-    return this.userRepository.update(id, user);
+    const userTemp = await this.findProfile(id);
+    const newUser = this.userRepository.merge(userTemp, user);
+    return this.userRepository.save(newUser);
+    //return this.userRepository.update(id, user);
   }
 
-  remove(id: number) {
-    return this.userRepository.delete(id);
+  async remove(id: number) {
+    //return this.userRepository.delete(id);
+    const user = await this.findOne(id);
+    return this.userRepository.remove(user);
   }
 
   findProfile(id: number) {
@@ -121,7 +126,7 @@ export class UserService {
     const user = await this.findOne(id);
     return this.logsRepository.find({
       where: {
-        user,
+        user: user.logs,
       },
       // relations: {
       //   user: true,

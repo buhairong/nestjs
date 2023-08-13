@@ -28,12 +28,12 @@ export class AllExceptionFilter implements ExceptionFilter {
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
     let msg = exception['response'] || 'Internal Server Error';
-    if (exception instanceof QueryFailedError) {
-      msg = exception.message;
-      if (exception.driverError.errno === 1062) {
-        msg = '唯一索引冲突';
-      }
-    }
+    // if (exception instanceof QueryFailedError) {
+    //   msg = exception.message;
+    //   if (exception.driverError.errno === 1062) {
+    //     msg = '唯一索引冲突';
+    //   }
+    // }
 
     const responseBody = {
       headers: request.headers,
