@@ -6,7 +6,7 @@
 // import { Logger } from '@nestjs/common';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { AllExceptionFilter } from './filters/all-exception.filter';
 
@@ -22,6 +22,12 @@ async function bootstrap() {
   const httpAdapter = app.get(HttpAdapterHost);
   const logger = new Logger();
   app.useGlobalFilters(new AllExceptionFilter(logger, httpAdapter));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      // 去除在类上不存在的字段
+      whitelist: true,
+    }),
+  );
 
   const port = 3000;
   await app.listen(port);

@@ -1,16 +1,19 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { User } from './user.entity';
 import { Logs } from '../logs/logs.entity';
 import { getUserDto } from './dto/get-user.dto';
 import { conditionUtils } from '../utils/db.helper';
+import { Roles } from '../roles/roles.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(Logs) private readonly logsRepository: Repository<Logs>,
+    @InjectRepository(Roles)
+    private readonly rolesRepository: Repository<Roles>,
   ) {}
 
   findAll(query: getUserDto) {
@@ -79,14 +82,29 @@ export class UserService {
   }
 
   find(username: string) {
-    return this.userRepository.find({ where: { username } });
+    return this.userRepository.findOne({ where: { username } });
   }
 
   findOne(id: number) {
     return this.userRepository.findOne({ where: { id } });
   }
 
-  async create(user: User) {
+  async create(user: Partial<User>) {
+    if (!user.roles) {
+      const role = await this.rolesRepository.findOne({
+        where: {
+          id: 2,
+        },
+      });
+      user.roles = [role];
+    }
+    if (user.roles instanceof Array && typeof user.roles[0] === 'number') {
+      user.roles = await this.rolesRepository.find({
+        where: {
+          id: In(user.roles),
+        },
+      });
+    }
     const userTmp = await this.userRepository.create(user);
     try {
       const res = this.userRepository.save(userTmp);

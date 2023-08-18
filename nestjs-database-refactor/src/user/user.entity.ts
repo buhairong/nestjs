@@ -25,10 +25,10 @@ export class User {
   password: string;
 
   // typescript -> 数据库 关联关系 Mapping
-  @OneToMany(() => Logs, (logs) => logs.user)
+  @OneToMany(() => Logs, (logs) => logs.user, { cascade: true })
   logs: Logs[];
 
-  @ManyToMany(() => Roles, (roles) => roles.users)
+  @ManyToMany(() => Roles, (roles) => roles.users, { cascade: ['insert'] })
   @JoinTable({ name: 'users_roles' })
   roles: Roles[];
 

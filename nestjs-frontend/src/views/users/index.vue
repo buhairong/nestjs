@@ -57,22 +57,33 @@
             <!-- username input -->
             <div class="mb-3">
               <label for="exampleFormControlInput1" class="form-label">用户名</label>
-              <input type="username" class="form-control" id="exampleFormControlInput1" placeholder="请输入用户名">
+              <input type="username" class="form-control" id="exampleFormControlInput1" placeholder="请输入用户名" v-model="formValue.username">
+            </div>
+
+            <div class="mb-3">
+              <label for="exampleFormControlInput1" class="form-label">密码</label>
+              <input type="password" class="form-control" id="exampleFormControlInput1" placeholder="请输入密码" v-model="formValue.password">
             </div>
             <!-- role checkbox -->
             <div class="mb-3">
               <label for="exampleFormControlInput1" class="form-label">角色</label>
               <div class="form-control border-0">
                 <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                  <input class="form-check-input" type="checkbox" :value="1" id="flexCheckChecked" v-model="formValue.roles">
+                  <label class="form-check-label" for="flexCheckChecked">
+                    管理员
+                  </label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" :value="2" id="flexCheckDefault" v-model="formValue.roles">
                   <label class="form-check-label" for="flexCheckDefault">
                     普通用户
                   </label>
                 </div>
                 <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
-                  <label class="form-check-label" for="flexCheckChecked">
-                    管理员
+                  <input class="form-check-input" type="checkbox" :value="3" id="flexCheckDefault1" v-model="formValue.roles">
+                  <label class="form-check-label" for="flexCheckDefault1">
+                    测试用户
                   </label>
                 </div>
               </div>
@@ -82,13 +93,13 @@
               <label for="exampleFormControlInput1" class="form-label">性别</label>
               <div class="form-control border-0">
                 <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
+                  <input class="form-check-input" type="radio" :value="1" name="flexRadioDefault" id="flexRadioDefault1" v-model="formValue.profile.gender">
                   <label class="form-check-label" for="flexRadioDefault1">
                     男
                   </label>
                 </div>
                 <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+                  <input class="form-check-input" type="radio" :value="2" name="flexRadioDefault" id="flexRadioDefault2" v-model="formValue.profile.gender">
                   <label class="form-check-label" for="flexRadioDefault2">
                     女
                   </label>
@@ -99,17 +110,17 @@
             <!-- avatar input/upload button -->
             <div class="mb-3">
               <label for="exampleFormControlInput1" class="form-label">用户头像</label>
-              <input type="username" class="form-control" id="exampleFormControlInput1" placeholder="请粘贴头像路径">
+              <input type="username" class="form-control" id="exampleFormControlInput1" placeholder="请粘贴头像路径" v-model="formValue.profile.photo">
             </div>
             <!-- address input -->
             <div class="mb-3">
               <label for="exampleFormControlInput1" class="form-label">地址</label>
-              <input type="username" class="form-control" id="exampleFormControlInput1" placeholder="请输入地址">
+              <input type="username" class="form-control" id="exampleFormControlInput1" placeholder="请输入地址" v-model="formValue.profile.address">
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-            <button type="button" class="btn btn-primary">确定</button>
+            <button type="button" class="btn btn-primary" @click="submit">确定</button>
           </div>
         </div>
       </div>
@@ -128,7 +139,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-            <button type="button" class="btn btn-primary">确定</button>
+            <button type="button" class="btn btn-primary" @click="deleteUser">确定</button>
           </div>
         </div>
       </div>
@@ -137,7 +148,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import axios from '@/utils/axios'
 import * as bootstrap from 'bootstrap'
 
@@ -167,24 +178,40 @@ async function getUsers() {
     lists.value = res
   }
 }
-getUsers()
+
+let localType: string = ''
+const formValue = reactive({
+  username: '',
+  password: '',
+  profile: {
+    gender: 0,
+    address: '',
+    photo: '',
+  } as Profile,
+  roles: [] as RoleItem[],
+} as UserItem)
 
 const deleteModal = ref()
 const editAndAddModel = ref()
 const msg = ref("新增")
+const tmpItem = ref({} as UserItem)
 
-deleteModal.value = new bootstrap.Modal(
-  document.getElementById("DeleteModal")!,
-  { backdrop: true }
-)
+onMounted(() => {
+  getUsers()
+  deleteModal.value = new bootstrap.Modal(
+    document.getElementById("DeleteModal"),
+    { backdrop: true }
+  )
 
-editAndAddModel.value = new bootstrap.Modal(
-  document.getElementById("EditAndAddModal")!,
-  { backdrop: true }
-)
+  editAndAddModel.value = new bootstrap.Modal(
+    document.getElementById("EditAndAddModal"),
+    { backdrop: true }
+  )
+})
 
 const openModal = (type: string, item?: UserItem) => {
-  console.log(item)
+  localType = type
+  tmpItem.value = item || ({} as UserItem)
   if (type === "delete") {
     deleteModal.value.show()
   } else if (type === "edit") {
@@ -194,6 +221,43 @@ const openModal = (type: string, item?: UserItem) => {
     msg.value = "新增"
     editAndAddModel.value.show()
   }
+}
+
+async function submit() {
+  console.log('formValue', formValue)
+  if (localType === "add") {
+    // 发送对应的数据到接口
+    const res = await axios.post("/user", formValue)
+    console.log("res", res)
+    // 清空form表单
+    Object.assign(formValue, {
+      username: "",
+      password: "",
+      profile: {
+        gender: 0,
+        address: "",
+        photo: "",
+      } as Profile,
+      roles: [] as RoleItem[],
+    })
+    // 关闭模态框
+    editAndAddModel.value.hide()
+    getUsers()
+  }
+}
+
+async function deleteUser() {
+  // 1.获取用户删除的item -> id
+  const id = tmpItem.value.id
+  // 2.发送删除请求
+  const res = (await axios.delete('/user/' + id)) as UserItem
+  // 3.请求成功之后关闭模态框
+  console.log('deleteSubmit ~ res', res)
+  if (res.username === tmpItem.value.username) {
+    deleteModal.value.hide()
+  }
+  // 获取新的列表数据并更新
+  getUsers()
 }
 </script>
 
