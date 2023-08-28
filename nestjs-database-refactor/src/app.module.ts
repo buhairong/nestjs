@@ -10,6 +10,8 @@ import { RolesModule } from './roles/roles.module';
 
 import { connectionParams } from '../ormconfig';
 import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AdminGuard } from './guards/admin.guard';
 
 const envFilePath = `.env.${process.env.NODE_ENV || `development`}`;
 
@@ -45,7 +47,13 @@ const envFilePath = `.env.${process.env.NODE_ENV || `development`}`;
     AuthModule,
   ],
   controllers: [],
-  providers: [Logger],
+  providers: [
+    Logger,
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AdminGuard,
+    // },
+  ],
   exports: [Logger],
 })
 export class AppModule {}

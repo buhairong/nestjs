@@ -4,7 +4,7 @@
       <form class="border shadow-sm rounded p-4">
         <div class="mb-3">
           <label for="exampleInputEmail1" class="form-label">用户名：</label>
-          <input type="email" :class="['form-control', {'is-invalid': loginInfo.usernameMsg}]" id="exampleInputEmail1" aria-describedby="emailHelp" v-model="loginInfo.username">
+          <input type="text" :class="['form-control', {'is-invalid': loginInfo.usernameMsg}]" id="exampleInputEmail1" aria-describedby="emailHelp" v-model="loginInfo.username">
           <div class="invalid-feedback">
             {{loginInfo.usernameMsg}}
           </div>
@@ -33,23 +33,29 @@
 
 <script lang="ts">
 import { defineComponent, reactive, computed } from "vue";
-import axios from "@/utils/axios";
 import { useRouter } from "vue-router";
+import { signin } from '@/api/login'
+import { useUserStore } from '@/store/user'
+
+interface LoginResponse {
+  access_token: string
+}
 
 export default defineComponent({
   setup() {
     // 获取路由实例
     const router = useRouter();
+    const store = useUserStore();
 
     const loginInfo = reactive({
       username: "",
       usernameMsg: computed(() => {
-        if (
-          loginInfo.username !== "" &&
-          !/[A-Z0-9._%+-]+@[A-Z0-9-]+.+.[A-Z]{2,4}/gim.test(loginInfo.username)
-        ) {
-          return "请输入正确的邮箱地址";
-        }
+        // if (
+        //   loginInfo.username !== "" &&
+        //   !/[A-Z0-9._%+-]+@[A-Z0-9-]+.+.[A-Z]{2,4}/gim.test(loginInfo.username)
+        // ) {
+        //   return "请输入正确的邮箱地址";
+        // }
         return "";
       }),
       password: "",
@@ -61,12 +67,19 @@ export default defineComponent({
       }),
     });
 
-    const submit = () => {
+    const submit = async () => {
       console.log(loginInfo);
-      router.push("/home");
-      // axios.post("/auth/login", loginInfo).then((res) => {
-      //   console.log(res);
-      // });
+      const { username, password } = loginInfo
+      const res = (await signin(username, password)) as unknown as LoginResponse
+      console.log(res)
+      if (res.access_token) {
+        store.$patch({
+          token: res.access_token
+        })
+        router.push("/home");
+      }
+      
+      
     };
 
     return {

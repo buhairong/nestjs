@@ -28,6 +28,7 @@ import {
 import { CreateUserPipe } from './pipes/create-user.pipe';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { AdminGuard } from '../guards/admin.guard';
 
 @Controller('user')
 @UseFilters(new TypeormFilter())
@@ -56,6 +57,7 @@ export class UserController {
   }
 
   @Get()
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   getUsers(@Query() query: getUserDto): any {
     return this.userService.findAll(query);
     // return this.userService.getUsers();

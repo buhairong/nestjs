@@ -1,7 +1,11 @@
 <template>
   <div>
     <div class="mb-3">
-      <button type="button" class="btn btn-primary px-3" @click="openModal('add')">
+      <button
+        type="button"
+        class="btn btn-primary px-3"
+        @click="openModal('add')"
+      >
         <i class="fas fa-plus"></i>新增
       </button>
     </div>
@@ -18,17 +22,26 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in lists" :key="item.id">
-          <th scope="row">1</th>
-          <td>{{item.username}}</td>
-          <td>{{item.roles.map(o=>o.name).join(',')}}</td>
-          <td>{{item.profile && item.profile.gender}}</td>
-          <td>{{item.profile && item.profile.photo}}</td>
-          <td>{{item.profile && item.profile.address}}</td>
+        <tr v-for="(item, index) in lists" :key="item.id">
+          <th scope="row">{{ index + 1 }}</th>
+          <td>{{ item.username }}</td>
+          <td>{{ item.roles.map((o) => o.name).join(',') }}</td>
+          <td>{{ item.profile && item.profile.gender }}</td>
+          <td>{{ item.profile && item.profile.photo }}</td>
+          <td>{{ item.profile && item.profile.address }}</td>
           <td>
-            <button type="button" class="btn btn-secondary px-3" @click="openModal('edit', item)">
-              <i class="far fa-edit me-2"></i>编辑</button>
-            <button type="button" class="btn btn-danger px-3 ms-3" @click="openModal('delete', item)">
+            <button
+              type="button"
+              class="btn btn-secondary px-3"
+              @click="openModal('edit', item)"
+            >
+              <i class="far fa-edit me-2"></i>编辑
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger px-3 ms-3"
+              @click="openModal('delete', item)"
+            >
               <i class="far fa-trash-alt me-2"></i>删除
             </button>
           </td>
@@ -45,112 +58,33 @@
       </ul>
     </nav>
 
-    <!-- Edit/Add Model -->
-    <div class="modal fade" id="EditAndAddModal" tabindex="-1" aria-labelledby="EditAndAddModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="EditAndAddModalLabel">{{msg}}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <!-- username input -->
-            <div class="mb-3">
-              <label for="exampleFormControlInput1" class="form-label">用户名</label>
-              <input type="username" class="form-control" id="exampleFormControlInput1" placeholder="请输入用户名" v-model="formValue.username">
-            </div>
+    <!-- Button trigger modal -->
+    <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#DeleteModal">
+      Launch demo modal
+    </button> -->
 
-            <div class="mb-3">
-              <label for="exampleFormControlInput1" class="form-label">密码</label>
-              <input type="password" class="form-control" id="exampleFormControlInput1" placeholder="请输入密码" v-model="formValue.password">
-            </div>
-            <!-- role checkbox -->
-            <div class="mb-3">
-              <label for="exampleFormControlInput1" class="form-label">角色</label>
-              <div class="form-control border-0">
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="checkbox" :value="1" id="flexCheckChecked" v-model="formValue.roles">
-                  <label class="form-check-label" for="flexCheckChecked">
-                    管理员
-                  </label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="checkbox" :value="2" id="flexCheckDefault" v-model="formValue.roles">
-                  <label class="form-check-label" for="flexCheckDefault">
-                    普通用户
-                  </label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="checkbox" :value="3" id="flexCheckDefault1" v-model="formValue.roles">
-                  <label class="form-check-label" for="flexCheckDefault1">
-                    测试用户
-                  </label>
-                </div>
-              </div>
-            </div>
-            <!-- gender radio -->
-            <div class="mb-3">
-              <label for="exampleFormControlInput1" class="form-label">性别</label>
-              <div class="form-control border-0">
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" :value="1" name="flexRadioDefault" id="flexRadioDefault1" v-model="formValue.profile.gender">
-                  <label class="form-check-label" for="flexRadioDefault1">
-                    男
-                  </label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" :value="2" name="flexRadioDefault" id="flexRadioDefault2" v-model="formValue.profile.gender">
-                  <label class="form-check-label" for="flexRadioDefault2">
-                    女
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <!-- avatar input/upload button -->
-            <div class="mb-3">
-              <label for="exampleFormControlInput1" class="form-label">用户头像</label>
-              <input type="username" class="form-control" id="exampleFormControlInput1" placeholder="请粘贴头像路径" v-model="formValue.profile.photo">
-            </div>
-            <!-- address input -->
-            <div class="mb-3">
-              <label for="exampleFormControlInput1" class="form-label">地址</label>
-              <input type="username" class="form-control" id="exampleFormControlInput1" placeholder="请输入地址" v-model="formValue.profile.address">
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-            <button type="button" class="btn btn-primary" @click="submit">确定</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Delete Modal -->
-    <div class="modal fade" id="DeleteModal" tabindex="-1" aria-labelledby="DeleteModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="DeleteModalLabel">删除</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            确定删除该记录吗？
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-            <button type="button" class="btn btn-primary" @click="deleteUser">确定</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <DeleteModal v-model:show="deleteShow" @delete="deleteSubmit"></DeleteModal>
+    <EditAddModal
+      v-model:show="editShow"
+      :schema="formSchema"
+      :msg="msg"
+      @submit="editSubmit"
+      @change="updateSchema"
+    ></EditAddModal>
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
-import axios from '@/utils/axios'
-import * as bootstrap from 'bootstrap'
+<script lang="ts">
+import { defineComponent, onMounted, reactive, ref } from 'vue';
+
+import axios from '@/utils/axios';
+
+import { getAllUsers } from '@/api/user';
+import { getRoles } from '@/api/roles';
+
+import DeleteModal from '@/components/modal/DeleteModal.vue';
+import EditAddModal from '@/components/modal/EditAddModal.vue';
+import { FormItem } from '@/components/Form.vue';
 
 interface Profile {
   gender: number;
@@ -171,95 +105,236 @@ interface UserItem {
   roles: RoleItem[];
 }
 
-const lists = ref<UserItem[]>([])
-async function getUsers() {
-  const res = await axios.get<UserItem[], UserItem[]>('/user')
-  if (res && res.length > 0) {
-    lists.value = res
-  }
-}
+export default defineComponent({
+  components: {
+    DeleteModal,
+    EditAddModal,
+  },
+  setup() {
+    const lists = ref([] as UserItem[]);
+    const tmpItem = ref({} as UserItem);
 
-let localType: string = ''
-const formValue = reactive({
-  username: '',
-  password: '',
-  profile: {
-    gender: 0,
-    address: '',
-    photo: '',
-  } as Profile,
-  roles: [] as RoleItem[],
-} as UserItem)
+    const formSchema = reactive([
+      {
+        field: '用户名',
+        type: 'input',
+        prop: 'username',
+        value: '',
+        attr: {
+          placeholder: '请输入用户名',
+        },
+      },
+      {
+        field: '密码',
+        type: 'input',
+        prop: 'password',
+        value: '',
+        attr: {
+          placeholder: '请输入登录密码',
+        },
+      },
+      {
+        field: '角色',
+        type: 'checkbox',
+        prop: 'roles',
+        value: [],
+        children: [
+          {
+            value: 1,
+            field: '普通用户',
+          },
+          {
+            value: 2,
+            field: '管理员',
+          },
+          {
+            value: 3,
+            field: '测试用户',
+          },
+        ],
+      },
+      {
+        field: '性别',
+        type: 'radio',
+        prop: 'gender',
+        value: 0,
+        children: [
+          {
+            value: 1,
+            field: '男',
+          },
+          {
+            value: 2,
+            field: '女',
+          },
+        ],
+      },
+      {
+        field: '头像',
+        type: 'input',
+        prop: 'photo',
+        value: '',
+        attr: {
+          placeholder: '请输入头像链接',
+        },
+      },
+      {
+        field: '地址',
+        type: 'input',
+        prop: 'address',
+        value: '',
+        attr: {
+          placeholder: '请输入地址',
+        },
+      },
+    ] as FormItem[]);
 
-const deleteModal = ref()
-const editAndAddModel = ref()
-const msg = ref("新增")
-const tmpItem = ref({} as UserItem)
+    const deleteShow = ref(false);
+    const editShow = ref(false);
 
-onMounted(() => {
-  getUsers()
-  deleteModal.value = new bootstrap.Modal(
-    document.getElementById("DeleteModal"),
-    { backdrop: true }
-  )
-
-  editAndAddModel.value = new bootstrap.Modal(
-    document.getElementById("EditAndAddModal"),
-    { backdrop: true }
-  )
-})
-
-const openModal = (type: string, item?: UserItem) => {
-  localType = type
-  tmpItem.value = item || ({} as UserItem)
-  if (type === "delete") {
-    deleteModal.value.show()
-  } else if (type === "edit") {
-    msg.value = "编辑"
-    editAndAddModel.value.show()
-  } else if (type === "add") {
-    msg.value = "新增"
-    editAndAddModel.value.show()
-  }
-}
-
-async function submit() {
-  console.log('formValue', formValue)
-  if (localType === "add") {
-    // 发送对应的数据到接口
-    const res = await axios.post("/user", formValue)
-    console.log("res", res)
-    // 清空form表单
-    Object.assign(formValue, {
-      username: "",
-      password: "",
+    // 这里的formValue在当前的案例中并未使用
+    // 一般可以把formValue与formSchema进行区别开来
+    // schema只去存放结构，formValue来存放对应的数据
+    // todo
+    const formValue = reactive({
+      username: '',
+      password: '',
       profile: {
         gender: 0,
-        address: "",
-        photo: "",
+        address: '',
+        photo: '',
       } as Profile,
       roles: [] as RoleItem[],
-    })
-    // 关闭模态框
-    editAndAddModel.value.hide()
-    getUsers()
-  }
-}
+    } as UserItem);
 
-async function deleteUser() {
-  // 1.获取用户删除的item -> id
-  const id = tmpItem.value.id
-  // 2.发送删除请求
-  const res = (await axios.delete('/user/' + id)) as UserItem
-  // 3.请求成功之后关闭模态框
-  console.log('deleteSubmit ~ res', res)
-  if (res.username === tmpItem.value.username) {
-    deleteModal.value.hide()
-  }
-  // 获取新的列表数据并更新
-  getUsers()
-}
+
+    // 模态框的控制handler
+    const msg = ref('新增');
+
+    // 获取数据
+    const getData = async () => {
+      const roles = (await getRoles()) as unknown as RoleItem[];
+      if (roles && roles.length) {
+        formSchema.forEach((o) => {
+          if (o.prop === 'roles') {
+            // 响应回来的是id,name,但是需要
+            // value,field
+            // 其中id对应value，name对应field
+            o.children = roles.map((item) => {
+              return {
+                value: item.id,
+                field: item.name,
+              };
+            });
+          }
+        });
+      }
+      const res = (await getAllUsers()) as unknown as UserItem[];
+      if (res && res.length > 0) {
+        lists.value = res;
+      }
+    };
+
+    onMounted(async () => {
+      // 初始化
+      await getData();
+    });
+
+    // 控制模态框
+    const openModal = (type: string, item?: UserItem) => {
+      tmpItem.value = item || ({} as UserItem);
+      // console.log(item);
+      if (type === 'delete') {
+        deleteShow.value = true;
+      } else if (type === 'edit') {
+        msg.value = '编辑';
+        editShow.value = true;
+        console.log('🚀 ~ file: index.vue:256 ~ openModal ~ item:', item);
+        item && updateSchema(item);
+      } else if (type === 'add') {
+        msg.value = '新增';
+        editShow.value = true;
+      }
+    };
+
+    const editSubmit = async (val: any) => {
+      console.log('🚀 ~ file: index.vue ~ line 221 ~ editSubmit ~ val', val);
+      console.log(formValue);
+      // 判断用户是新增，还是编辑
+      // if (localType === "add") {
+      //   // 发送对应的数据到接口
+      //   const res = await axios.post("/user", formValue);
+      //   console.log("🚀 ~ file: index.vue ~ line 238 ~ editSubmit ~ res", res);
+      //   // 清空form表单
+      //   Object.assign(formValue, {
+      //     username: "",
+      //     password: "",
+      //     profile: {
+      //       gender: 0,
+      //       address: "",
+      //       photo: "",
+      //     } as Profile,
+      //     roles: [] as RoleItem[],
+      //   });
+      //   // 关闭模态框
+      //   editShow.value = false;
+      // }
+      // todo作业 编辑
+      // 编辑的时候 —> 保存id信息 -> 传参把id代上
+      // 编辑之前，填充数据到form表单上 -> formValue -> mapper -> roles id
+    };
+
+    // 删除该条数据
+    const deleteSubmit = async () => {
+      // 1.获取用户删除的item -> id
+      const id = tmpItem.value.id;
+      // 2.发送删除请求
+      const res = (await axios.delete('/user/' + id)) as UserItem;
+      // 3.请求成功之后关闭模态框
+      console.log('🚀 ~ file: index.vue ~ line 272 ~ deleteSubmit ~ res', res);
+      if (res.username === tmpItem.value.username) {
+        deleteShow.value = false;
+      }
+      // 获取新的列表数据并更新
+      await getData();
+    };
+
+    const updateSchema = (val: any) => {
+      if (!val) return;
+      const keys = Object.keys(val);
+      formSchema.forEach((o) => {
+        if (keys.includes(o.prop)) {
+          if (o.prop === 'roles') {
+            if (val[o.prop] && val[o.prop].length > 0) {
+              if (val[o.prop][0].id) {
+                o.value = (val[o.prop] as RoleItem[]).map((item) => item.id);
+              } else {
+                o.value = val[o.prop];
+              }
+            } else {
+              o.value = [];
+            }
+          } else {
+            o.value = val[o.prop];
+          }
+        }
+      });
+    };
+
+    return {
+      formValue,
+      lists,
+      openModal,
+      msg,
+      editSubmit,
+      deleteSubmit,
+      deleteShow,
+      editShow,
+      formSchema,
+      updateSchema,
+    };
+  },
+});
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

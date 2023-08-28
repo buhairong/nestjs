@@ -9,6 +9,7 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { AllExceptionFilter } from './filters/all-exception.filter';
+import { SerializeInterceptor } from './interceptors/serialize.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -28,6 +29,8 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+
+  //app.useGlobalInterceptors(new SerializeInterceptor());
 
   const port = 3000;
   await app.listen(port);

@@ -5,12 +5,15 @@ import {
   HttpException,
   UseFilters,
   Req,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { TypeormFilter } from '../filters/typeorm.filter';
 import { SigninUserDto } from './dto/signin-user.dto';
 
 @Controller('auth')
+@UseInterceptors(ClassSerializerInterceptor)
 @UseFilters(new TypeormFilter())
 export class AuthController {
   constructor(private authService: AuthService) {}
